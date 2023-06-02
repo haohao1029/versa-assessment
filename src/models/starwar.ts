@@ -29,4 +29,18 @@ interface ExtractedChractersValue {
     gender: string;
 }
 
-export { StarWarsCharacter, StarWarsCharacterResponse, ExtractedChractersValue };
+interface Character {
+    name: string;
+    height: string;
+}
+interface CategorizedCharacters {
+    gender: string;
+    characters: Character[];
+}
+export {
+    StarWarsCharacter,
+    StarWarsCharacterResponse,
+    ExtractedChractersValue,
+    CategorizedCharacters,
+    Character
+};

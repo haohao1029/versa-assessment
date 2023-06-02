@@ -1,5 +1,5 @@
 import fs from "fs";
-import { StarWarsCharacter, StarWarsCharacterResponse, ExtractedChractersValue } from "./models/starwar";
+import { StarWarsCharacter, StarWarsCharacterResponse, ExtractedChractersValue, Character, CategorizedCharacters } from "./models/starwar";
 
 export const fetchStarWarsCharacters = async (url: string): Promise<StarWarsCharacterResponse> => {
     const response = await fetch(url);
@@ -19,7 +19,7 @@ export const extractChractersValue = (starWarsCharacters: StarWarsCharacter[]): 
 
 // save the data into a json file
 export const saveData = (data: ExtractedChractersValue[]) => {
-    fs.writeFile("starwars.json", JSON.stringify(data), (err) => {
+    fs.writeFile("output.json", JSON.stringify(data), (err) => {
         if (err) {
             console.log(err);
         }
@@ -54,12 +54,29 @@ export const categorizeCharactersByGender = (data: ExtractedChractersValue[]) =>
     });
 
     return categorizedCharacters;
-
 };
 
+
+// Sort the characters
 const start = async () => {
     const data = await startGetStarWarsCharacters("https://swapi.dev/api/people/", []);
+    data.sort((a, b) => {
+        const heightA = parseInt(a.height);
+        const heightB = parseInt(b.height);
+        
+        if (isNaN(heightA)) {
+            return isNaN(heightB) ? a.name.localeCompare(b.name) : 1;
+        } else if (isNaN(heightB)) {
+            return -1;
+        }
+        
+        return heightA - heightB || a.name.localeCompare(b.name);
+    
+    });
+    
+    
     const categorizedCharacters = categorizeCharactersByGender(data);
+
     saveData(categorizedCharacters);
 };
 
