@@ -28,12 +28,12 @@ export const saveData = (data: ExtractedChractersValue[]) => {
 
 export const startGetStarWarsCharacters = async (url: string, data: ExtractedChractersValue[]) => {
     const res = await fetchStarWarsCharacters(url);
+    console.log(url);
     url = res.next;
     if (url) {
         await startGetStarWarsCharacters(url, data);
     }
     data.push(...extractChractersValue(res.results));
-    console.log(url);
     return data;
 };
 
@@ -76,7 +76,6 @@ const start = async () => {
     
     
     const categorizedCharacters = categorizeCharactersByGender(data);
-
     saveData(categorizedCharacters);
 };
 
