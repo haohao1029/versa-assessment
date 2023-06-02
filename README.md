@@ -51,5 +51,5 @@ However, we can optimise it by call a few of https://swapi.dev/api/people/?page=
             "url": "https://swapi.dev/api/people/1/"
         }, 
     ]
-]
+}
 ```
