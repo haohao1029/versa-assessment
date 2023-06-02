@@ -1,61 +1,32 @@
-import fs from 'fs';
-interface StarWarsCharacter {
-    name: string;
-    height: string;
-    gender: string;
-    homeworld: string;
-    mass: string;
-    hair_color: string;
-    skin_color: string;
-    eye_color: string;
-    films: string[];
-    species: string[];
-    starships: string[];
-    vehicles: string[];
-    url: string;
-    created: string;
-    edited: string;
-}
+import fs from "fs";
+import { StarWarsCharacter, StarWarsCharacterResponse, ExtractedChractersValue } from "./models/starwar";
 
-interface StarWarsCharacterResponse {
-    count: number;
-    next: string;
-    previous: string;
-    results: StarWarsCharacter[];
-}
-
-interface ExtractedChractersValue {
-    name: string;
-    height: string;
-    gender: string;
-}
-
-const fetchStarWarsCharacters = async (url: string): Promise<StarWarsCharacterResponse> => {
+export const fetchStarWarsCharacters = async (url: string): Promise<StarWarsCharacterResponse> => {
     const response = await fetch(url);
     return response.json();
-}
+};
 
-const extractChractersValue = (starWarsCharacters: StarWarsCharacter[]): ExtractedChractersValue[] => {
+export const extractChractersValue = (starWarsCharacters: StarWarsCharacter[]): ExtractedChractersValue[] => {
 
     return starWarsCharacters.map((character) => {
         return {
             name: character.name,
             height: character.height,
             gender: character.gender
-        }
-    })
-}
+        };
+    });
+};
 
 // save the data into a json file
-const saveData = (data: ExtractedChractersValue[]) => {
-    fs.writeFile('starwars.json', JSON.stringify(data), (err) => {
+export const saveData = (data: ExtractedChractersValue[]) => {
+    fs.writeFile("starwars.json", JSON.stringify(data), (err) => {
         if (err) {
             console.log(err);
         }
-    })
-}
+    });
+};
 
-const startGetStarWarsCharacters = async (url: string, data: ExtractedChractersValue[]) => {
+export const startGetStarWarsCharacters = async (url: string, data: ExtractedChractersValue[]) => {
     const res = await fetchStarWarsCharacters(url);
     url = res.next;
     if (url) {
@@ -63,13 +34,33 @@ const startGetStarWarsCharacters = async (url: string, data: ExtractedChractersV
     }
     data.push(...extractChractersValue(res.results));
     console.log(url);
-
     return data;
-}
+};
+
+export const categorizeCharactersByGender = (data: ExtractedChractersValue[]) => {
+    // convert the        
+    const categorizedCharacters: any[] = [];
+
+    data.forEach((character) => {
+        const { name, height, gender } = character;
+
+        const existingCategory = categorizedCharacters.find((category) => category.gender === gender);
+
+        if (existingCategory) {
+            existingCategory.characters.push({ name, height });
+        } else {
+            categorizedCharacters.push({ gender, characters: [{ name, height }] });
+        }
+    });
+
+    return categorizedCharacters;
+
+};
 
 const start = async () => {
     const data = await startGetStarWarsCharacters("https://swapi.dev/api/people/", []);
-    saveData(data);
-}
+    const categorizedCharacters = categorizeCharactersByGender(data);
+    saveData(categorizedCharacters);
+};
 
 start();
